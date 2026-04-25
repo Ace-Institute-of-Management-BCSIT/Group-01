@@ -1,6 +1,6 @@
 # Group-01
 
 project ideas:
-E voting system
-Life manager
-student hub
+1.E voting system
+2.Life manager
+3.student hub
