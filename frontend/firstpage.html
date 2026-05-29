@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>National E‑Voting System</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,sans-serif}
+
+    /* Full screen hero */
+    .hero{
+      position:relative;
+      height:100vh;
+      width:100vw;
+      overflow:hidden;
+      background:#000;
+    }
+
+    .hero img.bg{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+     filter: brightness(0.5);
+    }
+
+    .overlay{
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,0.35);
+    }
+
+    .logo{
+      position:absolute;
+      top:20px;
+      right:25px;
+      width:150px;
+      z-index:2;
+     
+    }
+
+    .text{
+      position:absolute;
+      left:40px;
+      bottom:40px;
+      color:#fff;
+      z-index:2;
+    }
+
+    .text h1{
+      margin:0 0 10px;
+      font-size:56px;
+      font-weight:800;
+    }
+
+    .text p{
+      margin:0;
+      font-size:22px;
+      font-weight:700;
+      opacity:0.95;
+    }
+
+ 
+
+    @media (max-width:600px){
+      .logo{width:80px;right:16px;top:16px}
+      .text{left:16px;right:16px;bottom:90px}
+      .text h1{font-size:34px}
+      .text p{font-size:16px}
+      .btn{right:16px;bottom:16px}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="hero">
+    <img class="bg"
+      src="c:\Users\siddh\OneDrive\文档\ViberDownloads\0-02-03-95b8c1bd0603e7ed06e7c07e4c5a25257fdc55a9d20b1ab4d0320b03d18c64ad_d6a95fe373cc898b.jpg"
+      alt="Mountain" />
+
+    <div class="overlay"></div>
+
+    <!-- Put your emblem image file name here -->
+    <img class="logo" src="Emblem_of_Nepal.svg" alt="Logo" />
+
+    <div class="text">
+      <h1>National E‑Voting System</h1>
+      <p>Committed to Transparency, Security, and Electoral Integrity</p>
+    </div>
+
+    <a class="btn" href="secondpage.html">Continue →</a>
+  </div>
+</body>
+</html>
+
+
+<style>
+  .btn{
+    position:absolute;
+    right:40px;
+    bottom:40px;
+    background:#e10d3a;
+    color:#fff;
+    text-decoration:none;
+    padding:12px 18px;
+    border-radius:25px;
+    font-weight:700;
+    transition: 0.2s ease; /* smooth hover */
+  }
+
+  .btn:hover{
+    background:#ff2a55;           /* brighter */
+    box-shadow:0 10px 25px rgba(0,0,0,0.35); /* glow/shadow */
+    transform: translateY(-2px);  /* slight lift */
+  }
+</style>
