@@ -1,0 +1,303 @@
+<?php
+session_start();
+
+echo "<pre>";
+print_r($_POST);
+echo "</pre>";
+
+$conn = new mysqli("localhost","root","","voting_system");
+
+if($conn->connect_error){
+    die("Database Connection Failed");
+}
+
+if(isset($_POST['symbol_no'])){
+
+    $symbol_id = intval($_POST['symbol_no']);
+
+    echo "citizenship: " . $citizenship . "<br>";
+    echo "Symbol ID: " . $symbol_id . "<br>";
+
+    $stmt = $conn->prepare(
+        "INSERT INTO votes(user_id, symbol_id)
+         VALUES (?, ?)"
+    );
+
+    if(!$stmt){
+        die("Prepare Error: " . $conn->error);
+    }
+
+    $stmt->bind_param(
+        "ii",
+        $user_id,
+        $symbol_id
+    );
+
+    if(!$stmt->execute()){
+        die("Execute Error: " . $stmt->error);
+    }
+
+    echo "Vote inserted successfully!";
+    exit();
+}
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vote</title>
+
+<style>
+:root{
+  --overlay:rgba(11,86,148,.72);
+  --accent:#e0001a;
+  --border:rgba(255,255,255,.35);
+  --tile:rgba(255,255,255,.08);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  height:100vh;
+  overflow:hidden;
+  font-family:Arial,sans-serif;
+  color:#fff;
+  background:url("viber_image_2026-05-26_13-27-08-940.jpg") center/cover no-repeat;
+  position:relative;
+}
+
+body::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:var(--overlay);
+}
+
+.wrap{
+  position:relative;
+  z-index:1;
+  padding:20px;
+}
+
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+}
+
+h1{
+  font-size:64px;
+  font-weight:900;
+}
+
+.hint{
+  margin-top:10px;
+  font-size:24px;
+  color:#ffd65a;
+  font-style:italic;
+  font-weight:700;
+}
+
+.logo img{
+  width:180px;
+  height:180px;
+  object-fit:contain;
+}
+
+.grid{
+  margin-top:15px;
+  display:grid;
+  grid-template-columns:repeat(11,125px);
+  justify-content:center;
+  gap:4px;
+}
+
+.symbol-btn{
+  width:115px;
+  height:115px;
+  border:2px solid var(--border);
+  border-radius:10px;
+  background:var(--tile);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+.symbol-btn img{
+  width:75px;
+  height:75px;
+  object-fit:contain;
+}
+
+.symbol-btn span{
+  margin-top:6px;
+  font-size:18px;
+  font-weight:700;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+
+.modal.open{
+  display:flex;
+}
+
+.backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.55);
+}
+
+.dialog{
+  width:650px;
+  background:#07244a;
+  border:2px solid rgba(0,140,255,.4);
+  border-radius:22px;
+  padding:25px;
+  position:relative;
+}
+
+.dialog-top{
+  display:flex;
+  align-items:center;
+  gap:25px;
+}
+
+.dialog img{
+  width:170px;
+  height:170px;
+  object-fit:contain;
+  background:#fff;
+  border-radius:10px;
+}
+
+.dialog h2{
+  font-size:28px;
+  line-height:1.4;
+}
+
+.actions{
+  display:flex;
+  justify-content:center;
+  gap:15px;
+  margin-top:25px;
+}
+
+.btn{
+  border:none;
+  border-radius:10px;
+  padding:14px 36px;
+  font-size:22px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.cancel{
+  background:#7b808a;
+  color:#fff;
+}
+
+.vote{
+  background:#e0001a;
+  color:#fff;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<header>
+  <div>
+    <h1>Choose Your Party</h1>
+    <p class="hint">Tap a symbol to select your vote.</p>
+  </div>
+
+  <div class="logo">
+    <img src="Emblem_of_Nepal.svg" alt="">
+  </div>
+</header>
+
+<div class="grid" id="grid"></div>
+
+</div>
+
+<div class="modal" id="modal">
+  <div class="backdrop"></div>
+
+  <div class="dialog">
+    <div class="dialog-top">
+      <img id="confirmImg">
+      <h2>Are you sure you want to vote for this symbol?</h2>
+    </div>
+
+    <div class="actions">
+      <button class="btn cancel">Cancel</button>
+      <button class="btn vote">Yes, Vote</button>
+    </div>
+  </div>
+</div>
+
+<form method="POST" id="voteForm">
+    <input type="hidden" name="symbol_no" id="symbol_no">
+</form>
+
+<script>
+const grid=document.getElementById('grid');
+const modal=document.getElementById('modal');
+const confirmImg=document.getElementById('confirmImg');
+
+let selectedSymbol=null;
+
+grid.innerHTML=[...Array(37)].map((_,i)=>{
+  const n=String(i+1).padStart(2,'0');
+  return `
+  <button
+      class="symbol-btn"
+      data-symbol="${i+1}"
+      data-img="symbol_${n}.png">
+    <img src="symbol_${n}.png" alt="">
+    <span>${n}</span>
+  </button>`;
+}).join('');
+
+grid.onclick=e=>{
+  const btn=e.target.closest('.symbol-btn');
+  if(!btn) return;
+
+  selectedSymbol=btn.dataset.symbol;
+  confirmImg.src=btn.dataset.img;
+
+  modal.classList.add('open');
+};
+
+document.querySelector('.cancel').onclick=()=>{
+  modal.classList.remove('open');
+};
+
+document.querySelector('.backdrop').onclick=()=>{
+  modal.classList.remove('open');
+};
+
+document.querySelector('.vote').onclick=()=>{
+
+  document.getElementById('symbol_no').value =
+      selectedSymbol;
+
+  document.getElementById('voteForm').submit();
+};
+</script>
+
+</body>
+</html>
